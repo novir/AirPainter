@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx/8.0.112"
+      stylesheets="/air_painter/settings.css"
+      fx:controller="air_painter.Controller">
+
+    <GridPane alignment="CENTER_RIGHT" hgap="20" vgap="20">
+        <Label GridPane.rowIndex="0" GridPane.columnIndex="0" fx:id="introMessage" text="Start"/>
+        <Button GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#printIntroInfo" text="Start"/>
+
+
+        <Slider min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
+                majorTickUnit="50" minorTickCount="50" blockIncrement="1"/>
+
+
+    </GridPane>
+
+</HBox>
