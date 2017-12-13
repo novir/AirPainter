@@ -13,14 +13,21 @@
       stylesheets="/air_painter/settings.css"
       fx:controller="air_painter.Controller">
 
-    <GridPane alignment="CENTER_RIGHT" hgap="20" vgap="20">
-        <Label GridPane.rowIndex="0" GridPane.columnIndex="0" fx:id="introMessage" text="Start"/>
-        <Button GridPane.rowIndex="0" GridPane.columnIndex="1" onAction="#printIntroInfo" text="Start"/>
+    <GridPane alignment="CENTER_LEFT" hgap="20" vgap="20">
 
+        <Label GridPane.rowIndex="0" GridPane.columnIndex="0"
+               fx:id="introMessage" text="Start"/>
 
-        <Slider min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
-                majorTickUnit="50" minorTickCount="50" blockIncrement="1"/>
+        <Button GridPane.rowIndex="1" GridPane.columnIndex="0"
+                onAction="#printIntroInfo" text="Start"/>
 
+        <Slider GridPane.rowIndex="2" GridPane.columnIndex="0"
+                min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
+                majorTickUnit="20" minorTickCount="5" blockIncrement="1"/>
+
+        <Slider GridPane.rowIndex="3" GridPane.columnIndex="0"
+                min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
+                majorTickUnit="20" minorTickCount="5" blockIncrement="1"/>
 
     </GridPane>
 
