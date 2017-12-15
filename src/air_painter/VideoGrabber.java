@@ -1,5 +1,8 @@
 package air_painter;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -32,9 +35,9 @@ public class VideoGrabber {
 
     public void initializeCamera(int cameraNumber) {
         camera = new VideoCapture(cameraNumber);
-        camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 600);
         camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 800);
-        camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, 0.3);
+        camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 600);
+        adjustBrightness(0.5);
     }
 
     public Mat getNextFrame() {
@@ -45,24 +48,39 @@ public class VideoGrabber {
         return frame;
     }
 
+    @Nullable
     public BufferedImage getNextFrameAsImage() {
         Mat frame = getNextFrame();
         InputStream stream = convertFrameToStream(frame);
         return getImageFromStream(stream);
     }
 
+    @Contract("null -> null")
     private InputStream convertFrameToStream(Mat frame) {
+        if(frame == null) {
+            return null;
+        }
         MatOfByte buffer = new MatOfByte();
         Imgcodecs.imencode(".bmp", frame, buffer);
         return new ByteArrayInputStream(buffer.toArray());
     }
 
+    @Contract("null -> null")
     private BufferedImage getImageFromStream(InputStream stream) {
+        if(stream == null) {
+            return null;
+        }
         try {
             return ImageIO.read(stream);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void adjustBrightness(double value) {
+        if(value >= 0.0 && value <= 1.0) {
+            camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         }
     }
 
