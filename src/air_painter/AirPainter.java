@@ -1,7 +1,7 @@
 package air_painter;
 
-import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

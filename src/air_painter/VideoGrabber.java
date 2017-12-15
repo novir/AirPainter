@@ -1,7 +1,6 @@
 package air_painter;
 
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -11,8 +10,6 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -44,6 +41,8 @@ public class VideoGrabber {
         Mat frame = new Mat();
         if(isCameraRunning()) {
             camera.read(frame);
+        } else {
+            System.out.println("Camera is not running");
         }
         return frame;
     }
@@ -81,6 +80,8 @@ public class VideoGrabber {
     public void adjustBrightness(double value) {
         if(value >= 0.0 && value <= 1.0) {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
+        } else {
+            System.out.println("Brightness value out of range");
         }
     }
 

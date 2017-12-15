@@ -1,7 +1,7 @@
 package air_painter;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 
 public class Controller {
