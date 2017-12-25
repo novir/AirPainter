@@ -42,6 +42,7 @@ public class VideoGrabber {
         if(isCameraRunning()) {
             camera.read(frame);
         } else {
+            /* TODO change stdout to stderr */
             System.out.println("Camera is not running");
         }
         return frame;
@@ -81,6 +82,7 @@ public class VideoGrabber {
         if(value >= 0.0 && value <= 1.0) {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         } else {
+            /* TODO change stdout to stderr */
             System.out.println("Brightness value out of range");
         }
     }

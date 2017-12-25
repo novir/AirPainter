@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Slider?>
 
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox alignment="CENTER"
-      xmlns:fx="http://javafx.com/fxml/1"
-      xmlns="http://javafx.com/javafx/8.0.112"
+<?import javafx.scene.image.ImageView?>
+
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="air_painter.Controller"
       stylesheets="/air_painter/settings.css"
-      fx:controller="air_painter.Controller">
+      alignment="CENTER">
 
     <GridPane alignment="CENTER_LEFT" hgap="20" vgap="20">
 
-        <Label GridPane.rowIndex="0" GridPane.columnIndex="0"
-               fx:id="introMessage" text="Start"/>
+        <Label fx:id="displayLabel"
+               GridPane.rowIndex="0" GridPane.columnIndex="0">
+            Video</Label>
 
-        <Button GridPane.rowIndex="1" GridPane.columnIndex="0"
-                onAction="#printIntroInfo" text="Start"/>
+        <ImageView fx:id="imageDisplay"
+                   GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
-        <Slider GridPane.rowIndex="2" GridPane.columnIndex="0"
-                min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
-                majorTickUnit="20" minorTickCount="5" blockIncrement="1"/>
+        <Button text="Start" onAction="#startDisplay"
+                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
-        <Slider GridPane.rowIndex="3" GridPane.columnIndex="0"
-                min="0" max="100" value="0" showTickLabels="true" showTickMarks="true"
-                majorTickUnit="20" minorTickCount="5" blockIncrement="1"/>
+        <Slider showTickLabels="true" showTickMarks="true"
+                majorTickUnit="20" minorTickCount="5" blockIncrement="1"
+                GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+
+        <Slider showTickLabels="true" showTickMarks="true"
+                majorTickUnit="20" minorTickCount="5" blockIncrement="1"
+                GridPane.rowIndex="4" GridPane.columnIndex="0"/>
 
     </GridPane>
 
