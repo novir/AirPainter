@@ -26,15 +26,15 @@ public class VideoGrabber {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    public boolean isCameraRunning() {
-        return camera.isOpened();
-    }
-
-    public void initializeCamera(int cameraNumber) {
+    public VideoGrabber(int cameraNumber) {
         camera = new VideoCapture(cameraNumber);
         camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 800);
         camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 600);
         adjustBrightness(0.5);
+    }
+
+    public boolean isCameraRunning() {
+        return camera.isOpened();
     }
 
     public Mat getNextFrame() {
@@ -42,8 +42,7 @@ public class VideoGrabber {
         if(isCameraRunning()) {
             camera.read(frame);
         } else {
-            /* TODO change stdout to stderr */
-            System.out.println("Camera is not running");
+            System.err.println("Camera is not running");
         }
         return frame;
     }
@@ -82,8 +81,7 @@ public class VideoGrabber {
         if(value >= 0.0 && value <= 1.0) {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         } else {
-            /* TODO change stdout to stderr */
-            System.out.println("Brightness value out of range");
+            System.err.println("Brightness value out of range");
         }
     }
 
