@@ -2,6 +2,13 @@
 
 <?import javafx.scene.control.Slider?>
 
-<Slider showTickLabels="true" showTickMarks="true"
-        majorTickUnit="20" minorTickCount="5" blockIncrement="1"/>
+<Slider
+        majorTickUnit="20"
+        minorTickCount="5"
+        blockIncrement="1"
+        showTickMarks="true"
+        showTickLabels="true"
+        valueChanging="true"
+        orientation="VERTICAL"
+    />
 
