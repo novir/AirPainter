@@ -16,6 +16,8 @@
     <children>
 
         <ImageView fx:id="imageDisplay"
+                   fitWidth="800"
+                   fitHeight="600"
                    GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
         <Label fx:id="displayLabel" text="Video"
@@ -25,11 +27,15 @@
                 onAction="#startDisplay"
                 GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
+        <Button fx:id="stopButton" text="Stop"
+                onAction="#stopDisplay"
+                GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
         <fx:include source="/air_painter/default_slider.fxml" fx:id="slider1"
                     GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
         <fx:include source="/air_painter/default_slider.fxml" fx:id="slider2"
-                    GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
     </children>
 

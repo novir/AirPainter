@@ -1,5 +1,7 @@
 package air_painter;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.opencv.core.Core;
@@ -27,6 +29,7 @@ public class VideoGrabber {
     }
 
     public VideoGrabber(int cameraNumber) {
+        loadOpenCVLibrary();
         camera = new VideoCapture(cameraNumber);
         camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 800);
         camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 600);
@@ -39,7 +42,7 @@ public class VideoGrabber {
 
     public Mat getNextFrame() {
         Mat frame = new Mat();
-        if(isCameraRunning()) {
+        if (isCameraRunning()) {
             camera.read(frame);
         } else {
             System.err.println("Camera is not running");
@@ -48,7 +51,7 @@ public class VideoGrabber {
     }
 
     @Nullable
-    public BufferedImage getNextFrameAsImage() {
+    public Image getNextFrameAsImage() {
         Mat frame = getNextFrame();
         InputStream stream = convertFrameToStream(frame);
         return getImageFromStream(stream);
@@ -56,32 +59,47 @@ public class VideoGrabber {
 
     @Contract("null -> null")
     private InputStream convertFrameToStream(Mat frame) {
-        if(frame == null) {
+        if (frame == null) {
             return null;
         }
         MatOfByte buffer = new MatOfByte();
-        Imgcodecs.imencode(".bmp", frame, buffer);
+        Imgcodecs.imencode(".jpg", frame, buffer);
         return new ByteArrayInputStream(buffer.toArray());
     }
 
     @Contract("null -> null")
-    private BufferedImage getImageFromStream(InputStream stream) {
-        if(stream == null) {
+    private Image getImageFromStream(InputStream stream) {
+        if (stream == null) {
             return null;
         }
         try {
-            return ImageIO.read(stream);
+            BufferedImage awtImage = ImageIO.read(stream);
+            return convertAWTImageToFXImage(awtImage);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
 
+    @Contract("null -> null")
+    private Image convertAWTImageToFXImage(BufferedImage image) {
+        if (image == null) {
+            return null;
+        }
+        return SwingFXUtils.toFXImage(image, null);
+    }
+
     public void adjustBrightness(double value) {
-        if(value >= 0.0 && value <= 1.0) {
+        if (value >= 0.0 && value <= 1.0) {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         } else {
             System.err.println("Brightness value out of range");
+        }
+    }
+
+    public void releaseCamera() {
+        if (isCameraRunning()) {
+            camera.release();
         }
     }
 
