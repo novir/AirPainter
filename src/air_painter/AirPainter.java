@@ -16,13 +16,15 @@ import java.io.IOException;
 public class AirPainter extends Application {
 
     private FXMLLoader fxmlLoader = null;
-    private UIController controller = null;
     private Scene primaryScene = null;
+    private VideoController videoController = null;
 
     public AirPainter() {
         fxmlLoader = buildLoaderFromFXMLFile("root_elements.fxml", new HBox());
         primaryScene = buildPrimaryScene();
-        controller = fxmlLoader.getController();
+        UIController uiController = fxmlLoader.getController();
+        videoController = new VideoController(uiController);
+        uiController.setVideoController(videoController);
     }
 
     private FXMLLoader buildLoaderFromFXMLFile(@NotNull String fileName,
@@ -35,12 +37,12 @@ public class AirPainter extends Application {
 
     @NotNull
     private Scene buildPrimaryScene() {
-        Parent root = constructUI();
+        Parent root = loadUIHierarchyFromFXML();
         return new Scene(root, 1000, 800);
     }
 
     @Nullable
-    private Pane constructUI() {
+    private Pane loadUIHierarchyFromFXML() {
         try {
             return fxmlLoader.load();
         } catch (IOException e) {
@@ -60,7 +62,7 @@ public class AirPainter extends Application {
 
     @Override
     public void stop() {
-        controller.stopDisplay();
+        videoController.stopDisplay();
         Platform.exit();
     }
 

@@ -3,7 +3,7 @@ package air_painter;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -28,11 +28,11 @@ public class VideoGrabber {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
-    public VideoGrabber(int cameraNumber) {
+    public VideoGrabber(int deviceNumber) {
         loadOpenCVLibrary();
-        camera = new VideoCapture(cameraNumber);
-        camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 800);
-        camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 600);
+        camera = new VideoCapture(deviceNumber);
+        camera.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 640);
+        camera.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 480);
         adjustBrightness(0.5);
     }
 
@@ -40,6 +40,7 @@ public class VideoGrabber {
         return camera.isOpened();
     }
 
+    @NotNull
     public Mat getNextFrame() {
         Mat frame = new Mat();
         if (isCameraRunning()) {
@@ -50,7 +51,13 @@ public class VideoGrabber {
         return frame;
     }
 
-    @Nullable
+    @Contract("null -> null")
+    public Image convertFrameToImage(Mat frame) {
+        InputStream stream = convertFrameToStream(frame);
+        return getImageFromStream(stream);
+    }
+
+    @NotNull
     public Image getNextFrameAsImage() {
         Mat frame = getNextFrame();
         InputStream stream = convertFrameToStream(frame);
@@ -94,6 +101,12 @@ public class VideoGrabber {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         } else {
             System.err.println("Brightness value out of range");
+        }
+    }
+
+    public void openCamera(int deviceNumber) {
+        if (!isCameraRunning()) {
+            camera.open(deviceNumber);
         }
     }
 

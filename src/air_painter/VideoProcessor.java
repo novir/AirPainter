@@ -6,12 +6,14 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * Created by Pawel Pluta on 12/12/17.
  */
 public class VideoProcessor {
+
+
 
     public Mat performThresholding(Mat frame, Color minRGBValue, Color maxRGBValue) {
         Mat filteredFrame = new Mat();
@@ -22,12 +24,12 @@ public class VideoProcessor {
         if (frame != null) {
             Core.inRange(frame, minValues, maxValues, filteredFrame);
         } else {
-            System.out.println("Color thresholding: Frame can't be null");
+            System.err.println("Color thresholding: Frame can't be null");
         }
         return filteredFrame;
     }
 
-    public Mat applyMorphOpening(Mat frame, int k) {
+    public Mat applyMorphologicalOpening(Mat frame, int k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -35,12 +37,12 @@ public class VideoProcessor {
             Imgproc.erode(frame, filteredFrame, structuringElement);
             Imgproc.dilate(filteredFrame, filteredFrame, structuringElement);
         } else {
-            System.out.println("Morphological opening: Frame can't be null");
+            System.err.println("Morphological opening: Frame can't be null");
         }
         return filteredFrame;
     }
 
-    public Mat applyMorphClosing(Mat frame, int k) {
+    public Mat applyMorphologicalClosing(Mat frame, int k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -48,7 +50,7 @@ public class VideoProcessor {
             Imgproc.dilate(frame, filteredFrame, structuringElement);
             Imgproc.erode(filteredFrame, filteredFrame, structuringElement);
         } else {
-            System.out.println("Morphological closing: Frame can't be null");
+            System.err.println("Morphological closing: Frame can't be null");
         }
         return filteredFrame;
     }

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.layout.GridPane?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+
+<?import javafx.scene.image.ImageView?>
+
 <fx:root type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx"
          xmlns:fx="http://javafx.com/fxml"
@@ -10,7 +17,36 @@
 
     <children>
 
-        <fx:include source="video_output.fxml" fx:id="videoOutput"/>
+        <GridPane fx:id="videoDisplay"
+                  alignment="CENTER_LEFT" hgap="20" vgap="20">
+
+            <children>
+
+                <ImageView fx:id="imageDisplay"
+                           fitWidth="640"
+                           fitHeight="480"
+                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+
+                <Label fx:id="displayLabel" text="Video"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+
+                <Button fx:id="startButton" text="Start"
+                        onAction="#startDisplay"
+                        GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+
+                <Button fx:id="stopButton" text="Stop"
+                        onAction="#stopDisplay"
+                        GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <fx:include source="/air_painter/default_slider.fxml" fx:id="slider1"
+                            GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+
+                <fx:include source="/air_painter/default_slider.fxml" fx:id="slider2"
+                            GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+            </children>
+
+        </GridPane>
 
     </children>
 
