@@ -2,6 +2,7 @@ package air_painter;
 
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
+import org.opencv.core.Mat;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,15 +17,16 @@ public class VideoController {
 
     private VideoGrabber videoGrabber = null;
 
-    private VideoProcessor videoProcessor = null;
-
     private UIController uiController = null;
+
+    private int brightnessFactor = 150;
+
+    private double cameraBrightness = 0.5;
 
     private boolean requestedVideoOutput = false;
 
     public VideoController(@NotNull UIController controller) {
         videoGrabber = new VideoGrabber(0);
-        videoProcessor = new VideoProcessor();
         this.uiController = controller;
     }
 
@@ -35,11 +37,11 @@ public class VideoController {
     }
 
     private void startDisplayThread(long initialDelay, long replyPeriod,
-                                   TimeUnit unit) {
+                                    TimeUnit unit) {
         threadExecutor = Executors.newSingleThreadScheduledExecutor();
         Runnable videoCaptureInThread = () -> {
             if (requestedVideoOutput) {
-                Image fxImage = videoGrabber.getNextFrameAsImage();
+                Image fxImage = getProcessedFrameAsImage();
                 uiController.setImageToDisplay(fxImage);
             }
         };
@@ -47,10 +49,27 @@ public class VideoController {
                                            replyPeriod, unit);
     }
 
+    private Image getProcessedFrameAsImage() {
+        Mat frame = new Mat();
+        if(videoGrabber.isCameraRunning()) {
+            frame = videoGrabber.getNextFrame();
+            frame = processRawFrame(frame);
+        }
+        return videoGrabber.convertFrameToImage(frame);
+    }
+
+    private Mat processRawFrame(@NotNull Mat frame) {
+        frame = VideoProcessor.convertBGRToHSB(frame);
+        frame = VideoProcessor.performThresholding(frame, brightnessFactor);
+        frame = VideoProcessor.applyMorphologicalOpening(frame, 1);
+        frame = VideoProcessor.applyMorphologicalClosing(frame, 10);
+        return frame;
+    }
+
     public void stopDisplay() {
         if (requestedVideoOutput) {
             requestedVideoOutput = false;
-            shutdownThread(100, TimeUnit.MILLISECONDS);
+            stopDisplayThread(100, TimeUnit.MILLISECONDS);
             videoGrabber.releaseCamera();
         }
     }
@@ -69,6 +88,18 @@ public class VideoController {
         } catch (InterruptedException e) {
             System.err.println("Thread executor interrupted while waiting");
             e.getStackTrace();
+        }
+    }
+
+    public int getBrightnessFactor() {
+        return brightnessFactor;
+    }
+
+    public void setBrightnessFactor(int brightness) {
+        if (brightness >= 0 && brightness <= 255) {
+            brightnessFactor = brightness;
+        } else {
+            System.err.println("Brightness factor out of range");
         }
     }
 

@@ -7,28 +7,28 @@
 
 <?import javafx.scene.image.ImageView?>
 
+<?import javafx.scene.control.Slider?>
+
 <fx:root type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx"
          xmlns:fx="http://javafx.com/fxml"
-         fx:id="rootLayout"
          fx:controller="air_painter.UIController"
          stylesheets="/air_painter/settings.css"
          alignment="CENTER">
 
     <children>
 
-        <GridPane fx:id="videoDisplay"
-                  alignment="CENTER_LEFT" hgap="20" vgap="20">
+        <GridPane alignment="CENTER" hgap="20" vgap="20">
 
             <children>
+
+                <Label fx:id="displayLabel" text="Camera OFF"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
                 <ImageView fx:id="imageDisplay"
                            fitWidth="640"
                            fitHeight="480"
                            GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-
-                <Label fx:id="displayLabel" text="Video"
-                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
                 <Button fx:id="startButton" text="Start"
                         onAction="#startDisplay"
@@ -38,11 +38,13 @@
                         onAction="#stopDisplay"
                         GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                <fx:include source="/air_painter/default_slider.fxml" fx:id="slider1"
-                            GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-
-                <fx:include source="/air_painter/default_slider.fxml" fx:id="slider2"
-                            GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Slider fx:id="brightnessSlider"
+                        max="255"
+                        minorTickCount="5"
+                        blockIncrement="1"
+                        showTickMarks="true"
+                        showTickLabels="true"
+                        GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
             </children>
 

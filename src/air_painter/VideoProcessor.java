@@ -6,30 +6,44 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import java.awt.Color;
-
 /**
  * Created by Pawel Pluta on 12/12/17.
  */
 public class VideoProcessor {
 
+    public static Mat convertBGRToHSB(Mat bgrFrame) {
+        Mat hsbFrame = new Mat();
+        if (bgrFrame != null) {
+            Imgproc.cvtColor(bgrFrame, hsbFrame, Imgproc.COLOR_BGR2HSV);
+        } else {
+            System.err.println("Color conversion: Frame can't be null");
+        }
+        return hsbFrame;
+    }
 
+    public static Mat convertBGRToGray(Mat bgrFrame) {
+        Mat grayFrame = new Mat();
+        if (bgrFrame != null) {
+            Imgproc.cvtColor(bgrFrame, grayFrame, Imgproc.COLOR_BGR2GRAY);
+        } else {
+            System.err.println("Color conversion: Frame can't be null");
+        }
+        return grayFrame;
+    }
 
-    public Mat performThresholding(Mat frame, Color minRGBValue, Color maxRGBValue) {
+    public static Mat performThresholding(Mat frame, int brightness) {
         Mat filteredFrame = new Mat();
-        Scalar minValues =
-                new Scalar(minRGBValue.getBlue(), minRGBValue.getGreen(), minRGBValue.getRed());
-        Scalar maxValues =
-                new Scalar(maxRGBValue.getBlue(), maxRGBValue.getGreen(), maxRGBValue.getRed());
+        Scalar minHSB = new Scalar(110, 50, 50);
+        Scalar maxHSB = new Scalar(130, 255, brightness);
         if (frame != null) {
-            Core.inRange(frame, minValues, maxValues, filteredFrame);
+            Core.inRange(frame, minHSB, maxHSB, filteredFrame);
         } else {
             System.err.println("Color thresholding: Frame can't be null");
         }
         return filteredFrame;
     }
 
-    public Mat applyMorphologicalOpening(Mat frame, int k) {
+    public static Mat applyMorphologicalOpening(Mat frame, int k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -42,7 +56,7 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public Mat applyMorphologicalClosing(Mat frame, int k) {
+    public static Mat applyMorphologicalClosing(Mat frame, int k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
