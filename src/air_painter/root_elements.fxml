@@ -1,55 +1,139 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.GridPane?>
-
-<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
-
-<?import javafx.scene.image.ImageView?>
-
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<fx:root type="javafx.scene.layout.HBox"
-         xmlns="http://javafx.com/javafx"
-         xmlns:fx="http://javafx.com/fxml"
+<fx:root type="javafx.scene.layout.BorderPane"
+         xmlns="http://javafx.com/javafx/8.0.112"
+         xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="air_painter.UIController"
-         stylesheets="/air_painter/settings.css"
-         alignment="CENTER">
+         prefHeight="200.0" prefWidth="200.0"
+         stylesheets="/air_painter/settings.css">
 
-    <children>
+    <center>
 
-        <GridPane alignment="CENTER" hgap="20" vgap="20">
+        <ImageView fx:id="imageDisplay" fitWidth="640" fitHeight="480"
+                   BorderPane.alignment="CENTER">
+            <BorderPane.margin>
+                <Insets bottom="30.0" left="30.0" right="30.0" top="50.0"/>
+            </BorderPane.margin>
+        </ImageView>
 
-            <children>
+    </center>
 
-                <Label fx:id="displayLabel" text="Camera OFF"
-                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <top>
 
-                <ImageView fx:id="imageDisplay"
-                           fitWidth="640"
-                           fitHeight="480"
-                           GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <VBox alignment="CENTER">
 
-                <Button fx:id="startButton" text="Start"
-                        onAction="#startDisplay"
-                        GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+            <Label fx:id="displayLabel"
+                   text="Camera OFF"
+                   alignment="TOP_CENTER"
+                   textAlignment="CENTER">
+                <opaqueInsets>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </opaqueInsets>
+                <font>
+                    <Font name="Droid Serif" size="18.0"/>
+                </font>
+            </Label>
 
-                <Button fx:id="stopButton" text="Stop"
-                        onAction="#stopDisplay"
-                        GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        </VBox>
 
-                <Slider fx:id="brightnessSlider"
-                        max="255"
-                        minorTickCount="5"
-                        blockIncrement="1"
-                        showTickMarks="true"
-                        showTickLabels="true"
-                        GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    </top>
 
-            </children>
+    <bottom>
+
+        <GridPane alignment="CENTER" BorderPane.alignment="CENTER">
+
+            <Button onAction="#startDisplay" text="On"
+                    GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+
+            <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0"
+                       GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+            </Separator>
+
+            <Button onAction="#stopDisplay" text="Off"
+                    GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+
+            <Separator opacity="0.0" orientation="VERTICAL" prefHeight="200.0"
+                       GridPane.columnIndex="3" GridPane.rowIndex="0">
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+            </Separator>
+
+            <ColorPicker GridPane.columnIndex="4" GridPane.rowIndex="0"/>
 
         </GridPane>
 
-    </children>
+    </bottom>
+
+    <right>
+
+        <VBox BorderPane.alignment="CENTER">
+
+            <Label text="Brightness factor (HSB): "
+                   wrapText="true" VBox.vgrow="NEVER">
+                <font>
+                    <Font size="12.0"/>
+                </font>
+            </Label>
+
+            <Slider fx:id="brightnessFactor" max="255.0"
+                    minorTickCount="5" orientation="VERTICAL"
+                    showTickLabels="true" showTickMarks="true"
+                    value="100.0" VBox.vgrow="ALWAYS">
+                <cursor>
+                    <Cursor fx:constant="OPEN_HAND"/>
+                </cursor>
+                <padding>
+                    <Insets bottom="10.0" left="30.0" right="10.0" top="10.0"/>
+                </padding>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </Slider>
+
+        </VBox>
+
+    </right>
+
+    <left>
+
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+
+            <Label text="Camera brightness: " textAlignment="CENTER"
+                   wrapText="true" VBox.vgrow="NEVER">
+                <font>
+                    <Font size="12.0"/>
+                </font>
+            </Label>
+
+            <Slider minorTickCount="5" orientation="VERTICAL" showTickLabels="true"
+                    showTickMarks="true" value="50.0" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="10.0" left="30.0" right="10.0" top="10.0"/>
+                </padding>
+                <VBox.margin>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </VBox.margin>
+            </Slider>
+
+        </VBox>
+
+    </left>
 
 </fx:root>

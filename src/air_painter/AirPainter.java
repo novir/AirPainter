@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
@@ -20,7 +21,8 @@ public class AirPainter extends Application {
     private VideoController videoController = null;
 
     public AirPainter() {
-        fxmlLoader = buildLoaderFromFXMLFile("root_elements.fxml", new HBox());
+        fxmlLoader = buildLoaderFromFXMLFile("root_elements.fxml",
+                                             new BorderPane());
         primaryScene = buildPrimaryScene();
         UIController uiController = fxmlLoader.getController();
         videoController = new VideoController(uiController);

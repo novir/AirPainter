@@ -19,7 +19,7 @@ public class VideoController {
 
     private UIController uiController = null;
 
-    private int brightnessFactor = 150;
+    private int brightnessFactor = 100;
 
     private double cameraBrightness = 0.5;
 

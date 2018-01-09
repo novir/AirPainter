@@ -19,7 +19,7 @@ public class UIController {
     private ImageView imageDisplay = null;
 
     @FXML
-    private Slider brightnessSlider = null;
+    private Slider brightnessFactor = null;
 
     public void setVideoController(@NotNull VideoController controller) {
         this.videoController = controller;
@@ -33,7 +33,7 @@ public class UIController {
 
     @FXML
     private void initialize() {
-        brightnessSlider.valueProperty()
+        brightnessFactor.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {
             videoController.setBrightnessFactor(newValue.intValue());
         });
