@@ -21,7 +21,7 @@ public class AirPainter extends Application {
     private VideoController videoController = null;
 
     public AirPainter() {
-        fxmlLoader = buildLoaderFromFXMLFile("root_elements.fxml",
+        fxmlLoader = buildLoaderFromFXMLFile("gui_elements.fxml",
                                              new BorderPane());
         primaryScene = buildPrimaryScene();
         UIController uiController = fxmlLoader.getController();

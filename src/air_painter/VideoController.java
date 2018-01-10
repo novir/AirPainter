@@ -19,9 +19,7 @@ public class VideoController {
 
     private UIController uiController = null;
 
-    private int brightnessFactor = 100;
-
-    private double cameraBrightness = 0.5;
+    private double brightnessFactor = 100.0;
 
     private boolean requestedVideoOutput = false;
 
@@ -53,17 +51,9 @@ public class VideoController {
         Mat frame = new Mat();
         if(videoGrabber.isCameraRunning()) {
             frame = videoGrabber.getNextFrame();
-            frame = processRawFrame(frame);
+            frame = VideoProcessor.process(frame);
         }
         return videoGrabber.convertFrameToImage(frame);
-    }
-
-    private Mat processRawFrame(@NotNull Mat frame) {
-        frame = VideoProcessor.convertBGRToHSB(frame);
-        frame = VideoProcessor.performThresholding(frame, brightnessFactor);
-        frame = VideoProcessor.applyMorphologicalOpening(frame, 1);
-        frame = VideoProcessor.applyMorphologicalClosing(frame, 10);
-        return frame;
     }
 
     public void stopDisplay() {
@@ -86,20 +76,31 @@ public class VideoController {
             threadExecutor.awaitTermination(timeout, unit);
             threadExecutor.shutdownNow();
         } catch (InterruptedException e) {
-            System.err.println("Thread executor interrupted while waiting");
+            System.err.println("VideoController: " +
+                    "Thread executor interrupted while waiting");
             e.getStackTrace();
         }
     }
 
-    public int getBrightnessFactor() {
+    public double getBrightnessFactor() {
         return brightnessFactor;
     }
 
-    public void setBrightnessFactor(int brightness) {
-        if (brightness >= 0 && brightness <= 255) {
+    public void setBrightnessFactor(double brightness) {
+        if (brightness >= 0.0 && brightness <= 255.0) {
             brightnessFactor = brightness;
         } else {
-            System.err.println("Brightness factor out of range");
+            System.err.println("VideoController: " +
+                    "Brightness factor out of range");
+        }
+    }
+
+    public void setCameraBrightness(double brightness) {
+        if (brightness >= 0.0 && brightness <= 1.0) {
+            videoGrabber.adjustBrightness(brightness);
+        } else {
+            System.err.println("VideoController: " +
+                    "Camera brightness out of range");
         }
     }
 

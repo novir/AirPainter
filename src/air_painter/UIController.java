@@ -21,6 +21,10 @@ public class UIController {
     @FXML
     private Slider brightnessFactor = null;
 
+    @FXML
+    private Slider cameraBrightness = null;
+
+
     public void setVideoController(@NotNull VideoController controller) {
         this.videoController = controller;
     }
@@ -35,7 +39,11 @@ public class UIController {
     private void initialize() {
         brightnessFactor.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {
-            videoController.setBrightnessFactor(newValue.intValue());
+            videoController.setBrightnessFactor(newValue.doubleValue());
+        });
+        cameraBrightness.valueProperty()
+                .addListener((observable, oldValue, newValue) -> {
+            videoController.setCameraBrightness(newValue.doubleValue() / 100.0);
         });
     }
 
