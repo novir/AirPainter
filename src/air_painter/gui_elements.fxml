@@ -35,7 +35,7 @@
 
         <VBox alignment="CENTER">
 
-            <Label fx:id="displayLabel"
+            <Label fx:id="cameraStatus"
                    text="Camera OFF"
                    alignment="TOP_CENTER"
                    textAlignment="CENTER">

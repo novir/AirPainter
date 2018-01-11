@@ -14,15 +14,15 @@ import org.opencv.video.Video;
  */
 public class VideoProcessor {
 
-    public static Mat process(@NotNull Mat frame) {
-        Mat processedFrame = VideoProcessor.convertBGRToHSB(frame);
-        processedFrame = VideoProcessor.performThreshold(processedFrame);
-        processedFrame = VideoProcessor.subtractBackground(processedFrame);
-        processedFrame = VideoProcessor.performAdaptiveThreshold(processedFrame);
-        processedFrame = VideoProcessor.applyMorphologicalOpening(processedFrame, 5);
-        processedFrame = VideoProcessor.applyMorphologicalClosing(processedFrame, 5);
-        processedFrame = VideoProcessor.applyDilation(processedFrame, 20);
-        return processedFrame;
+    public static Mat process(@NotNull Mat rawFrame) {
+        Mat frame = VideoProcessor.convertBGRToHSB(rawFrame);
+        frame = VideoProcessor.performBlueThreshold(frame);
+        frame = VideoProcessor.subtractBackground(frame);
+        frame = VideoProcessor.performAdaptiveThreshold(frame);
+        frame = VideoProcessor.applyMorphologicalOpening(frame, 5);
+        frame = VideoProcessor.applyMorphologicalClosing(frame, 5);
+        frame = VideoProcessor.applyDilation(frame, 20);
+        return frame;
     }
 
     public static Mat convertBGRToHSB(@NotNull Mat bgrFrame) {
@@ -37,7 +37,7 @@ public class VideoProcessor {
         return grayFrame;
     }
 
-    public static Mat performThreshold(@NotNull Mat frame) {
+    public static Mat performBlueThreshold(@NotNull Mat frame) {
         Mat filteredFrame = new Mat();
         Scalar minHSB = new Scalar(110, 100, 100);
         Scalar maxHSB = new Scalar(130, 255, 255);
@@ -82,7 +82,7 @@ public class VideoProcessor {
     public static Mat subtractBackground(@NotNull Mat frame) {
         Mat foregroundMask = new Mat();
         BackgroundSubtractorMOG2 bgSubtractor =
-                Video.createBackgroundSubtractorMOG2();
+                                Video.createBackgroundSubtractorMOG2();
         bgSubtractor.apply(frame, foregroundMask);
         return foregroundMask;
     }

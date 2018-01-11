@@ -7,17 +7,17 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 public class AirPainter extends Application {
 
-    private FXMLLoader fxmlLoader = null;
     private Scene primaryScene = null;
+
+    private FXMLLoader fxmlLoader = null;
+
     private VideoController videoController = null;
 
     public AirPainter() {
@@ -43,14 +43,14 @@ public class AirPainter extends Application {
         return new Scene(root, 1000, 800);
     }
 
-    @Nullable
+    @NotNull
     private Pane loadUIHierarchyFromFXML() {
         try {
             return fxmlLoader.load();
         } catch (IOException e) {
             System.err.println("Failed to load object hierarchy from FXML file");
             e.printStackTrace();
-            return null;
+            return new Pane();
         }
     }
 

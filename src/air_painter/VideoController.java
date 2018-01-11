@@ -19,8 +19,6 @@ public class VideoController {
 
     private UIController uiController = null;
 
-    private double brightnessFactor = 100.0;
-
     private boolean requestedVideoOutput = false;
 
     public VideoController(@NotNull UIController controller) {
@@ -77,21 +75,8 @@ public class VideoController {
             threadExecutor.shutdownNow();
         } catch (InterruptedException e) {
             System.err.println("VideoController: " +
-                    "Thread executor interrupted while waiting");
+                               "Thread executor interrupted while waiting");
             e.getStackTrace();
-        }
-    }
-
-    public double getBrightnessFactor() {
-        return brightnessFactor;
-    }
-
-    public void setBrightnessFactor(double brightness) {
-        if (brightness >= 0.0 && brightness <= 255.0) {
-            brightnessFactor = brightness;
-        } else {
-            System.err.println("VideoController: " +
-                    "Brightness factor out of range");
         }
     }
 
@@ -100,7 +85,7 @@ public class VideoController {
             videoGrabber.adjustBrightness(brightness);
         } else {
             System.err.println("VideoController: " +
-                    "Camera brightness out of range");
+                               "Camera brightness out of range");
         }
     }
 

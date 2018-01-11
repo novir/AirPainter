@@ -13,11 +13,12 @@ public class UIController {
     private VideoController videoController = null;
 
     @FXML
-    private Label displayLabel = null;
+    private Label cameraStatus = null;
 
     @FXML
     private ImageView imageDisplay = null;
 
+    /* TODO unused slider could be reused */
     @FXML
     private Slider brightnessFactor = null;
 
@@ -39,7 +40,7 @@ public class UIController {
     private void initialize() {
         brightnessFactor.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {
-            videoController.setBrightnessFactor(newValue.doubleValue());
+            //videoController.setBrightnessFactor(newValue.doubleValue());
         });
         cameraBrightness.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {
@@ -49,13 +50,13 @@ public class UIController {
 
     @FXML
     private void startDisplay(ActionEvent actionEvent) {
-        displayLabel.setText("Camera ON");
+        cameraStatus.setText("Camera ON");
         videoController.startDisplay();
     }
 
     @FXML
     private void stopDisplay(ActionEvent actionEvent) {
-        displayLabel.setText("Camera OFF");
+        cameraStatus.setText("Camera OFF");
         videoController.stopDisplay();
     }
 
