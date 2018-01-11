@@ -49,7 +49,7 @@ public class VideoController {
         Mat frame = new Mat();
         if(videoGrabber.isCameraRunning()) {
             frame = videoGrabber.getNextFrame();
-            frame = VideoProcessor.process(frame);
+            frame = VideoProcessor.trackBlueObject(frame);
         }
         return videoGrabber.convertFrameToImage(frame);
     }
