@@ -3,6 +3,7 @@ package air_painter;
 import org.jetbrains.annotations.NotNull;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
 
@@ -22,7 +23,7 @@ public class VideoProcessor {
         frame = VideoProcessor.applyMorphologicalOpening(frame, 5);
         frame = VideoProcessor.applyMorphologicalClosing(frame, 5);
         frame = VideoProcessor.applyDilation(frame, 10);
-        drawContours(rawFrame, frame, 50);
+        drawCircleFromContours(rawFrame, frame, 100);
         return rawFrame;
     }
 
@@ -40,8 +41,8 @@ public class VideoProcessor {
 
     public static Mat performBlueThreshold(@NotNull Mat frame) {
         Mat filteredFrame = new Mat();
-        Scalar minHSB = new Scalar(110, 100, 100);
-        Scalar maxHSB = new Scalar(130, 255, 255);
+        Scalar minHSB = new Scalar(105, 100, 100);
+        Scalar maxHSB = new Scalar(135, 255, 255);
         Core.inRange(frame, minHSB, maxHSB, filteredFrame);
         return filteredFrame;
     }
@@ -83,27 +84,36 @@ public class VideoProcessor {
     public static Mat subtractBackground(@NotNull Mat frame) {
         Mat foregroundMask = new Mat();
         BackgroundSubtractorMOG2 bgSubtractor =
-                                Video.createBackgroundSubtractorMOG2();
+                Video.createBackgroundSubtractorMOG2();
         bgSubtractor.apply(frame, foregroundMask);
         return foregroundMask;
     }
 
-    public static void drawContours(@NotNull Mat rawFrame,
-                                    @NotNull Mat processedFrame,
-                                    double contourHeight) {
+    public static void drawCircleFromContours(@NotNull Mat rawFrame,
+                                              @NotNull Mat processedFrame,
+                                              double minContourHeight) {
         List<MatOfPoint> contours = findContours(processedFrame);
-        for(int i = 0; i < contours.size(); i++) {
-            if(contours.get(i).size().height > contourHeight) {
-                Imgproc.drawContours(rawFrame, contours, i,
-                        new Scalar(0,0,255), 4);
+        for (MatOfPoint contour : contours) {
+            if (contour.height() > minContourHeight) {
+                Imgproc.circle(rawFrame, calculateCentroid(contour), 30,
+                               new Scalar(0, 0, 255), 4);
             }
         }
     }
 
+    @NotNull
+    public static Point calculateCentroid(@NotNull MatOfPoint contour) {
+        Moments moments = Imgproc.moments(contour);
+        double cX = moments.get_m10() / moments.get_m00();
+        double cY = moments.get_m01() / moments.get_m00();
+        return new Point(cX, cY);
+    }
+
+    @NotNull
     public static List<MatOfPoint> findContours(@NotNull Mat frame) {
         List<MatOfPoint> contours = new ArrayList<>(20);
-        Imgproc.findContours(frame, contours, new Mat(), Imgproc.RETR_LIST,
-                Imgproc.CHAIN_APPROX_NONE, new Point(0,0));
+        Imgproc.findContours(frame, contours, new Mat(), Imgproc.RETR_EXTERNAL,
+                Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         return contours;
     }
 
