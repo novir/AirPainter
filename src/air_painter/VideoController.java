@@ -19,6 +19,8 @@ public class VideoController {
 
     private UIController uiController = null;
 
+    private double minObjectHeight = 25.0;
+
     private boolean requestedVideoOutput = false;
 
     public VideoController(@NotNull UIController controller) {
@@ -49,7 +51,7 @@ public class VideoController {
         Mat frame = new Mat();
         if(videoGrabber.isCameraRunning()) {
             frame = videoGrabber.getNextFrame();
-            frame = VideoProcessor.trackBlueObject(frame);
+            frame = VideoProcessor.trackBlueObject(frame, minObjectHeight);
         }
         return videoGrabber.convertFrameToImage(frame);
     }
@@ -86,6 +88,12 @@ public class VideoController {
         } else {
             System.err.println("VideoController: " +
                                "Camera brightness out of range");
+        }
+    }
+
+    public void setMinObjectHeight(double height) {
+        if (height >= 0.0) {
+            minObjectHeight = height;
         }
     }
 

@@ -83,19 +83,20 @@
 
     <right>
 
-        <VBox BorderPane.alignment="CENTER">
+        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
 
-            <Label text="Brightness factor (HSB): "
-                   wrapText="true" VBox.vgrow="NEVER">
+            <Label text="Minimum contour height (in pixels): "
+                   textAlignment="CENTER" wrapText="true"
+                   VBox.vgrow="NEVER">
                 <font>
                     <Font size="12.0"/>
                 </font>
             </Label>
 
-            <Slider fx:id="brightnessFactor" max="255.0"
+            <Slider fx:id="minObjectHeight" max="100.0"
                     minorTickCount="5" orientation="VERTICAL"
                     showTickLabels="true" showTickMarks="true"
-                    value="100.0" VBox.vgrow="ALWAYS">
+                    value="25.0" VBox.vgrow="ALWAYS">
                 <cursor>
                     <Cursor fx:constant="OPEN_HAND"/>
                 </cursor>

@@ -18,9 +18,8 @@ public class UIController {
     @FXML
     private ImageView imageDisplay = null;
 
-    /* TODO unused slider could be reused */
     @FXML
-    private Slider brightnessFactor = null;
+    private Slider minObjectHeight = null;
 
     @FXML
     private Slider cameraBrightness = null;
@@ -38,9 +37,9 @@ public class UIController {
 
     @FXML
     private void initialize() {
-        brightnessFactor.valueProperty()
+        minObjectHeight.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {
-            //videoController.setBrightnessFactor(newValue.doubleValue());
+            videoController.setMinObjectHeight(newValue.doubleValue());
         });
         cameraBrightness.valueProperty()
                 .addListener((observable, oldValue, newValue) -> {

@@ -15,15 +15,16 @@ import java.util.List;
  */
 public class VideoProcessor {
 
-    public static Mat trackBlueObject(@NotNull Mat rawFrame) {
+    public static Mat trackBlueObject(@NotNull Mat rawFrame,
+                                      double minObjectHeight) {
         Mat frame = VideoProcessor.convertBGRToHSB(rawFrame);
-        frame = VideoProcessor.performBlueThreshold(frame);
+        frame = VideoProcessor.performBlueObjectThreshold(frame);
         frame = VideoProcessor.subtractBackground(frame);
         frame = VideoProcessor.performAdaptiveThreshold(frame);
         frame = VideoProcessor.applyMorphologicalOpening(frame, 5);
         frame = VideoProcessor.applyMorphologicalClosing(frame, 5);
         frame = VideoProcessor.applyDilation(frame, 10);
-        drawCircleFromContours(rawFrame, frame, 100);
+        drawCircleFromContours(rawFrame, frame, minObjectHeight);
         return rawFrame;
     }
 
@@ -39,7 +40,7 @@ public class VideoProcessor {
         return grayFrame;
     }
 
-    public static Mat performBlueThreshold(@NotNull Mat frame) {
+    public static Mat performBlueObjectThreshold(@NotNull Mat frame) {
         Mat filteredFrame = new Mat();
         Scalar minHSB = new Scalar(105, 100, 100);
         Scalar maxHSB = new Scalar(135, 255, 255);
@@ -93,20 +94,9 @@ public class VideoProcessor {
                                               @NotNull Mat processedFrame,
                                               double minContourHeight) {
         List<MatOfPoint> contours = findContours(processedFrame);
-        for (MatOfPoint contour : contours) {
-            if (contour.height() > minContourHeight) {
-                Imgproc.circle(rawFrame, calculateCentroid(contour), 30,
-                               new Scalar(0, 0, 255), 4);
-            }
-        }
-    }
-
-    @NotNull
-    public static Point calculateCentroid(@NotNull MatOfPoint contour) {
-        Moments moments = Imgproc.moments(contour);
-        double cX = moments.get_m10() / moments.get_m00();
-        double cY = moments.get_m01() / moments.get_m00();
-        return new Point(cX, cY);
+        Point avgCentroid = calculateAvgCentroid(contours, minContourHeight);
+        Imgproc.circle(rawFrame, avgCentroid, 30,
+                new Scalar(0, 0, 255), 4);
     }
 
     @NotNull
@@ -115,6 +105,33 @@ public class VideoProcessor {
         Imgproc.findContours(frame, contours, new Mat(), Imgproc.RETR_EXTERNAL,
                 Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         return contours;
+    }
+
+    @NotNull
+    public static Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours,
+                                             double minContourHeight) {
+        double avgX = 0.0;
+        double avgY = 0.0;
+        double contoursCount = 0;
+        for (MatOfPoint contour : contours) {
+            if (contour.height() > minContourHeight) {
+                Point centroid = calculateCentroid(contour);
+                avgX += centroid.x;
+                avgY += centroid.y;
+                contoursCount++;
+            }
+        }
+        avgX /= contoursCount;
+        avgY /= contoursCount;
+        return new Point(avgX, avgY);
+    }
+
+    @NotNull
+    public static Point calculateCentroid(@NotNull MatOfPoint contour) {
+        Moments moments = Imgproc.moments(contour);
+        double cX = moments.get_m10() / moments.get_m00();
+        double cY = moments.get_m01() / moments.get_m00();
+        return new Point(cX, cY);
     }
 
 }
