@@ -24,7 +24,6 @@ public class UIController {
     @FXML
     private Slider cameraBrightness = null;
 
-
     public void setVideoController(@NotNull VideoController controller) {
         this.videoController = controller;
     }
@@ -48,15 +47,30 @@ public class UIController {
     }
 
     @FXML
-    private void startDisplay(ActionEvent actionEvent) {
+    private void startDisplay() {
         cameraStatus.setText("Camera ON");
         videoController.startDisplay();
     }
 
     @FXML
-    private void stopDisplay(ActionEvent actionEvent) {
+    private void stopDisplay() {
         cameraStatus.setText("Camera OFF");
         videoController.stopDisplay();
+    }
+
+    @FXML
+    private void startDrawing() {
+        videoController.startDrawing();
+    }
+
+    @FXML
+    private void stopDrawing() {
+        videoController.stopDrawing();
+    }
+
+    @FXML
+    private void eraseDrawing() {
+        videoController.eraseDrawing();
     }
 
 }

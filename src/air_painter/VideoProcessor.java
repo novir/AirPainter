@@ -15,17 +15,15 @@ import java.util.List;
  */
 public class VideoProcessor {
 
-    public static Mat trackBlueObject(@NotNull Mat rawFrame,
-                                      double minObjectHeight) {
-        Mat frame = VideoProcessor.convertBGRToHSB(rawFrame);
+    public static Mat findBlueObject(@NotNull Mat originalFrame) {
+        Mat frame = VideoProcessor.convertBGRToHSB(originalFrame);
         frame = VideoProcessor.performBlueObjectThreshold(frame);
         frame = VideoProcessor.subtractBackground(frame);
         frame = VideoProcessor.performAdaptiveThreshold(frame);
         frame = VideoProcessor.applyMorphologicalOpening(frame, 5);
         frame = VideoProcessor.applyMorphologicalClosing(frame, 5);
         frame = VideoProcessor.applyDilation(frame, 10);
-        drawCircleFromContours(rawFrame, frame, minObjectHeight);
-        return rawFrame;
+        return frame;
     }
 
     public static Mat convertBGRToHSB(@NotNull Mat bgrFrame) {
@@ -90,36 +88,44 @@ public class VideoProcessor {
         return foregroundMask;
     }
 
-    public static void drawCircleFromContours(@NotNull Mat rawFrame,
-                                              @NotNull Mat processedFrame,
-                                              double minContourHeight) {
-        List<MatOfPoint> contours = findContours(processedFrame);
-        Point avgCentroid = calculateAvgCentroid(contours, minContourHeight);
-        Imgproc.circle(rawFrame, avgCentroid, 30,
-                new Scalar(0, 0, 255), 4);
+    @NotNull
+    public static List<MatOfPoint> findBigContours(@NotNull Mat trackedObject,
+                                                   double minContourHeight) {
+        List<MatOfPoint> contours = findContours(trackedObject);
+        contours = removeSmallContours(contours, minContourHeight);
+        return contours;
     }
 
     @NotNull
-    public static List<MatOfPoint> findContours(@NotNull Mat frame) {
+    public static List<MatOfPoint> findContours(@NotNull Mat trackedObject) {
         List<MatOfPoint> contours = new ArrayList<>(20);
-        Imgproc.findContours(frame, contours, new Mat(), Imgproc.RETR_EXTERNAL,
+        Imgproc.findContours(trackedObject, contours, new Mat(), Imgproc.RETR_EXTERNAL,
                 Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         return contours;
     }
 
     @NotNull
-    public static Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours,
-                                             double minContourHeight) {
+    public static List<MatOfPoint> removeSmallContours(@NotNull List<MatOfPoint> contours,
+                                                       double minContourHeight) {
+        List<MatOfPoint> bigContours = new ArrayList<>(10);
+        for (MatOfPoint contour : contours) {
+            if (contour.height() > minContourHeight) {
+                bigContours.add(contour);
+            }
+        }
+        return bigContours;
+    }
+
+    @NotNull
+    public static Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours) {
         double avgX = 0.0;
         double avgY = 0.0;
         double contoursCount = 0;
         for (MatOfPoint contour : contours) {
-            if (contour.height() > minContourHeight) {
-                Point centroid = calculateCentroid(contour);
-                avgX += centroid.x;
-                avgY += centroid.y;
-                contoursCount++;
-            }
+            Point centroid = calculateCentroid(contour);
+            avgX += centroid.x;
+            avgY += centroid.y;
+            contoursCount++;
         }
         avgX /= contoursCount;
         avgY /= contoursCount;
