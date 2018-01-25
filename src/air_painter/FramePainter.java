@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Created by paul on 12/01/18.
  */
-public class ImagePainter {
+public class FramePainter {
 
     private Set<Point> drawingCoordinates = new HashSet<>();
 
@@ -20,16 +20,20 @@ public class ImagePainter {
         drawingCoordinates.add(coordinates);
     }
 
-    public void drawAllPoints(@NotNull Mat frame) {
+    public Mat drawAllPoints(@NotNull Mat frame) {
+        Mat result = frame.clone();
         for (Point point : drawingCoordinates) {
-            Imgproc.circle(frame, point, 3,
+            Imgproc.circle(result, point, 3,
                     new Scalar(0, 255, 0), 5);
         }
+        return result;
     }
 
-    public void drawCircle(@NotNull Mat frame, @NotNull Point center) {
-        Imgproc.circle(frame, center, 30,
+    public Mat drawCircle(@NotNull Mat frame, @NotNull Point center) {
+        Mat result = frame.clone();
+        Imgproc.circle(result, center, 30,
                 new Scalar(0, 0, 255), 4);
+        return result;
     }
 
     public void eraseAllPoints() {

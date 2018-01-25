@@ -1,6 +1,5 @@
 package air_painter;
 
-import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
@@ -25,7 +24,7 @@ public class UIController {
     private Slider cameraBrightness = null;
 
     public void setVideoController(@NotNull VideoController controller) {
-        this.videoController = controller;
+        videoController = controller;
     }
 
     public void setImageToDisplay(Image image) {

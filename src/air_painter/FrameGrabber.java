@@ -1,6 +1,5 @@
 package air_painter;
 
-import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -11,18 +10,18 @@ import java.io.IOException;
 /**
  * Created by Pawel Pluta on 12/12/17.
  */
-public class VideoGrabber {
+public class FrameGrabber {
 
     private VideoCapture camera = null;
 
-    public VideoGrabber(int deviceNumber) throws IOException {
+    public FrameGrabber(int deviceNumber) throws IOException {
         camera = new VideoCapture(deviceNumber);
         if (isCameraRunning()) {
             setDisplayWidth(640);
             setDisplayHeight(480);
             adjustBrightness(0.5);
         } else {
-            throw new IOException("VideoGrabber: No camera found");
+            throw new IOException("FrameGrabber: No camera found");
         }
     }
 
@@ -32,7 +31,7 @@ public class VideoGrabber {
         }
         camera.open(deviceNumber);
         if (!isCameraRunning()) {
-            throw new IOException("VideoGrabber: No camera found");
+            throw new IOException("FrameGrabber: No camera found");
         }
     }
 
@@ -46,7 +45,7 @@ public class VideoGrabber {
         if (camera != null) {
             return camera.isOpened();
         } else {
-            throw new IOException("VideoGrabber: No camera found");
+            throw new IOException("FrameGrabber: No camera found");
         }
     }
 
@@ -61,25 +60,19 @@ public class VideoGrabber {
         return frame;
     }
 
-    @NotNull
-    public Image getNextFrameAsImage() throws IOException {
-        Mat frame = getNextFrame();
-        return FrameConverter.convertToImage(frame);
-    }
-
-    public void adjustBrightness(double value) throws IOException {
+    public void setCameraBrightness(double value) throws IOException {
         if (value >= 0.0 && value <= 1.0) {
-            setCameraBrightness(value);
+            adjustBrightness(value);
         } else {
-            System.err.println("adjustBrightness: Brightness value out of range");
+            System.err.println("setCameraBrightness: Brightness value out of range");
         }
     }
 
-    private void setCameraBrightness(double value) throws IOException {
+    private void adjustBrightness(double value) throws IOException {
         if (isCameraRunning()) {
             camera.set(Videoio.CV_CAP_PROP_BRIGHTNESS, value);
         } else {
-            System.err.println("setCameraBrightness: Camera is not running");
+            System.err.println("adjustBrightness: Camera is not running");
         }
     }
 

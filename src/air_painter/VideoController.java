@@ -2,14 +2,11 @@ package air_painter;
 
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -19,47 +16,46 @@ import java.util.concurrent.TimeUnit;
  */
 public class VideoController {
 
-    private final Image noCameraDisplay;
+    private static final Image noCameraDisplay;
 
-    private VideoGrabber videoGrabber = null;
+    private FrameGrabber frameGrabber = null;
 
-    private ImagePainter imagePainter = null;
+    private ObjectTracker objectTracker = null;
+
+    private FramePainter framePainter = null;
 
     private UIController uiController = null;
 
     private ScheduledExecutorService threadExecutor = null;
 
-    private double minObjectHeight = 25.0;
-
     private boolean requestedVideoOutput = false;
 
     private boolean requestedPictureDrawing = false;
 
-    public static void loadOpenCVLibrary() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    static {
+        File image = new File("./no_camera.jpg");
+        noCameraDisplay = new Image(image.toURI().toString());
     }
 
     public VideoController(@NotNull UIController controller) {
-        loadOpenCVLibrary();
-        this.uiController = controller;
-        imagePainter = new ImagePainter();
-        File image = new File("./no_camera.jpg");
-        noCameraDisplay = new Image(image.toURI().toString());
+        uiController = controller;
+        objectTracker = new ObjectTracker();
+        framePainter = new FramePainter();
     }
 
     public void startDisplay() {
         try {
             int cameraNumber = 0;
-            if (videoGrabber == null) {
-                videoGrabber = new VideoGrabber(cameraNumber);
+            if (frameGrabber == null) {
+                frameGrabber = new FrameGrabber(cameraNumber);
             } else {
-                videoGrabber.openCamera(cameraNumber);
+                frameGrabber.openCamera(cameraNumber);
             }
             requestedVideoOutput = true;
             startDisplayThread(0, 1, TimeUnit.MILLISECONDS);
         } catch (IOException e) {
-            uiController.setImageToDisplay(noCameraDisplay);
             System.err.println(e.getMessage());
+            uiController.setImageToDisplay(noCameraDisplay);
         }
     }
 
@@ -77,33 +73,26 @@ public class VideoController {
     }
 
     private Image getImageWithDrawing() {
-        if (videoGrabber != null) {
+        if (frameGrabber != null) {
             try {
-                Mat frame = videoGrabber.getNextFrame();
-                Point centroid = getTrackedObjectCoordinates(frame);
-                drawOnFrame(frame, centroid);
+                Mat frame = frameGrabber.getNextFrame();
+                Point centroid = objectTracker.getObjectCoordinates(frame);
+                frame = drawOnFrame(frame, centroid);
                 return FrameConverter.convertToImage(frame);
             } catch (IOException e) {
                 System.err.println(e.getMessage());
+                return noCameraDisplay;
             }
         }
         return noCameraDisplay;
     }
 
-    @NotNull
-    private Point getTrackedObjectCoordinates(@NotNull Mat originalFrame) {
-        Mat blueObject = VideoProcessor.findBlueObject(originalFrame);
-        List<MatOfPoint> contours =
-                VideoProcessor.findBigContours(blueObject, minObjectHeight);
-        return VideoProcessor.calculateAvgCentroid(contours);
-    }
-
-    private void drawOnFrame(@NotNull Mat frame, @NotNull Point coordinates) {
-        imagePainter.drawCircle(frame, coordinates);
+    private Mat drawOnFrame(@NotNull Mat frame, @NotNull Point coordinates) {
+        Mat result = framePainter.drawCircle(frame, coordinates);
         if (requestedPictureDrawing) {
-            imagePainter.addNextPoint(coordinates);
+            framePainter.addNextPoint(coordinates);
         }
-        imagePainter.drawAllPoints(frame);
+        return framePainter.drawAllPoints(result);
     }
 
     public void stopDisplay() {
@@ -133,9 +122,9 @@ public class VideoController {
     }
 
     private void stopCamera() {
-        if (videoGrabber != null) {
+        if (frameGrabber != null) {
             try {
-                videoGrabber.releaseCamera();
+                frameGrabber.releaseCamera();
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }
@@ -143,9 +132,9 @@ public class VideoController {
     }
 
     public void setCameraBrightness(double brightness) {
-        if (videoGrabber != null) {
+        if (frameGrabber != null) {
             try {
-                videoGrabber.adjustBrightness(brightness);
+                frameGrabber.setCameraBrightness(brightness);
             } catch (IOException e) {
                 System.err.println(e.getMessage());
             }
@@ -153,9 +142,7 @@ public class VideoController {
     }
 
     public void setMinObjectHeight(double height) {
-        if (height > 0.0) {
-            minObjectHeight = height;
-        }
+            objectTracker.setMinContourHeight(height);
     }
 
     public void startDrawing() {
@@ -172,7 +159,7 @@ public class VideoController {
 
     public void eraseDrawing() {
         if (requestedVideoOutput) {
-            imagePainter.eraseAllPoints();
+            framePainter.eraseAllPoints();
         }
     }
 

@@ -13,32 +13,38 @@ import java.util.List;
 /**
  * Created by Pawel Pluta on 12/12/17.
  */
-public class VideoProcessor {
+public class ObjectTracker {
 
-    public static Mat findBlueObject(@NotNull Mat originalFrame) {
-        Mat frame = VideoProcessor.convertBGRToHSB(originalFrame);
-        frame = VideoProcessor.performBlueObjectThreshold(frame);
-        frame = VideoProcessor.subtractBackground(frame);
-        frame = VideoProcessor.performAdaptiveThreshold(frame);
-        frame = VideoProcessor.applyMorphologicalOpening(frame, 5);
-        frame = VideoProcessor.applyMorphologicalClosing(frame, 5);
-        frame = VideoProcessor.applyDilation(frame, 10);
-        return frame;
+    private double minContourHeight = 25.0;
+
+    @NotNull
+    public Mat findBlueObject(@NotNull Mat source) {
+        Mat processed = convertBGRToHSB(source);
+        processed = performBlueObjectThreshold(processed);
+        processed = subtractBackground(processed);
+        processed = performAdaptiveThreshold(processed);
+        processed = applyMorphologicalOpening(processed, 5);
+        processed = applyMorphologicalClosing(processed, 5);
+        processed = applyDilation(processed, 10);
+        return processed;
     }
 
-    public static Mat convertBGRToHSB(@NotNull Mat bgrFrame) {
+    @NotNull
+    public Mat convertBGRToHSB(@NotNull Mat bgrFrame) {
         Mat hsbFrame = new Mat();
         Imgproc.cvtColor(bgrFrame, hsbFrame, Imgproc.COLOR_BGR2HSV);
         return hsbFrame;
     }
 
-    public static Mat convertBGRToGray(@NotNull Mat bgrFrame) {
+    @NotNull
+    public Mat convertBGRToGray(@NotNull Mat bgrFrame) {
         Mat grayFrame = new Mat();
         Imgproc.cvtColor(bgrFrame, grayFrame, Imgproc.COLOR_BGR2GRAY);
         return grayFrame;
     }
 
-    public static Mat performBlueObjectThreshold(@NotNull Mat frame) {
+    @NotNull
+    public Mat performBlueObjectThreshold(@NotNull Mat frame) {
         Mat filteredFrame = new Mat();
         Scalar minHSB = new Scalar(105, 100, 100);
         Scalar maxHSB = new Scalar(135, 255, 255);
@@ -46,7 +52,8 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public static Mat applyMorphologicalOpening(@NotNull Mat frame, double k) {
+    @NotNull
+    public Mat applyMorphologicalOpening(@NotNull Mat frame, double k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -55,7 +62,8 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public static Mat applyMorphologicalClosing(@NotNull Mat frame, double k) {
+    @NotNull
+    public Mat applyMorphologicalClosing(@NotNull Mat frame, double k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -64,7 +72,8 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public static Mat applyDilation(@NotNull Mat frame, double k) {
+    @NotNull
+    public Mat applyDilation(@NotNull Mat frame, double k) {
         Mat filteredFrame = new Mat();
         Mat structuringElement =
                 Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(k, k));
@@ -72,7 +81,8 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public static Mat performAdaptiveThreshold(@NotNull Mat frame) {
+    @NotNull
+    public Mat performAdaptiveThreshold(@NotNull Mat frame) {
         Mat filteredFrame = new Mat();
         Imgproc.adaptiveThreshold(frame, filteredFrame, 255,
                 Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV,
@@ -80,7 +90,8 @@ public class VideoProcessor {
         return filteredFrame;
     }
 
-    public static Mat subtractBackground(@NotNull Mat frame) {
+    @NotNull
+    public Mat subtractBackground(@NotNull Mat frame) {
         Mat foregroundMask = new Mat();
         BackgroundSubtractorMOG2 bgSubtractor =
                 Video.createBackgroundSubtractorMOG2();
@@ -89,25 +100,30 @@ public class VideoProcessor {
     }
 
     @NotNull
-    public static List<MatOfPoint> findBigContours(@NotNull Mat trackedObject,
-                                                   double minContourHeight) {
+    public Point getObjectCoordinates(@NotNull Mat source) {
+        Mat blueObject = findBlueObject(source);
+        List<MatOfPoint> contours = findBigContours(blueObject);
+        return calculateAvgCentroid(contours);
+    }
+
+    @NotNull
+    public List<MatOfPoint> findBigContours(@NotNull Mat trackedObject) {
         List<MatOfPoint> contours = findContours(trackedObject);
-        contours = removeSmallContours(contours, minContourHeight);
+        contours = removeSmallContours(contours);
         return contours;
     }
 
     @NotNull
-    public static List<MatOfPoint> findContours(@NotNull Mat trackedObject) {
-        List<MatOfPoint> contours = new ArrayList<>(20);
+    public List<MatOfPoint> findContours(@NotNull Mat trackedObject) {
+        List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(trackedObject, contours, new Mat(), Imgproc.RETR_EXTERNAL,
                 Imgproc.CHAIN_APPROX_SIMPLE, new Point(0, 0));
         return contours;
     }
 
     @NotNull
-    public static List<MatOfPoint> removeSmallContours(@NotNull List<MatOfPoint> contours,
-                                                       double minContourHeight) {
-        List<MatOfPoint> bigContours = new ArrayList<>(10);
+    public List<MatOfPoint> removeSmallContours(@NotNull List<MatOfPoint> contours) {
+        List<MatOfPoint> bigContours = new ArrayList<>();
         for (MatOfPoint contour : contours) {
             if (contour.height() > minContourHeight) {
                 bigContours.add(contour);
@@ -117,7 +133,7 @@ public class VideoProcessor {
     }
 
     @NotNull
-    public static Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours) {
+    public Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours) {
         double avgX = 0.0;
         double avgY = 0.0;
         double contoursCount = 0;
@@ -133,11 +149,17 @@ public class VideoProcessor {
     }
 
     @NotNull
-    public static Point calculateCentroid(@NotNull MatOfPoint contour) {
+    public Point calculateCentroid(@NotNull MatOfPoint contour) {
         Moments moments = Imgproc.moments(contour);
         double cX = moments.get_m10() / moments.get_m00();
         double cY = moments.get_m01() / moments.get_m00();
         return new Point(cX, cY);
+    }
+
+    public void setMinContourHeight(double height) {
+        if (height > 0.0) {
+            minContourHeight = height;
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
 import org.jetbrains.annotations.NotNull;
+import org.opencv.core.Core;
 
 import java.io.IOException;
 
@@ -21,26 +22,22 @@ public class AirPainter extends Application {
     private VideoController videoController = null;
 
     public AirPainter() {
-        fxmlLoader = buildLoaderFromFXMLFile("gui_elements.fxml",
-                                             new BorderPane());
-        primaryScene = buildPrimaryScene();
-        UIController uiController = fxmlLoader.getController();
-        videoController = new VideoController(uiController);
-        uiController.setVideoController(videoController);
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        initFXMLLoader();
+        initPrimaryScene();
+        bindControllers();
     }
 
-    private FXMLLoader buildLoaderFromFXMLFile(@NotNull String fileName,
-                                               @NotNull Pane rootPane) {
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(AirPainter.class.getResource(fileName));
-        fxmlLoader.setRoot(rootPane);
-        return fxmlLoader;
+    private void initFXMLLoader() {
+        String fxmlFile = "gui_elements.fxml";
+        fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(AirPainter.class.getResource(fxmlFile));
+        fxmlLoader.setRoot(new BorderPane());
     }
 
-    @NotNull
-    private Scene buildPrimaryScene() {
+    private void initPrimaryScene() {
         Parent root = loadUIHierarchyFromFXML();
-        return new Scene(root, 1000, 800);
+        primaryScene = new Scene(root, 1000, 800);
     }
 
     @NotNull
@@ -49,9 +46,14 @@ public class AirPainter extends Application {
             return fxmlLoader.load();
         } catch (IOException e) {
             System.err.println("Failed to load object hierarchy from FXML file");
-            e.printStackTrace();
             return new Pane();
         }
+    }
+
+    private void bindControllers() {
+        UIController uiController = fxmlLoader.getController();
+        videoController = new VideoController(uiController);
+        uiController.setVideoController(videoController);
     }
 
     @Override
