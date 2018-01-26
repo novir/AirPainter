@@ -9,6 +9,7 @@ import org.opencv.video.Video;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Created by Pawel Pluta on 12/12/17.
@@ -100,7 +101,7 @@ public class ObjectTracker {
     }
 
     @NotNull
-    public Point getObjectCoordinates(@NotNull Mat source) {
+    public Point getCoordinates(@NotNull Mat source) {
         Mat blueObject = findBlueObject(source);
         MatOfPoint contour = findBiggestContour(blueObject);
         return calculateCentroid(contour);
@@ -130,21 +131,6 @@ public class ObjectTracker {
             }
         }
         return bigContour;
-    }
-
-    @NotNull
-    public Point calculateAvgCentroid(@NotNull List<Point> coordinates) {
-        double avgX = 0.0;
-        double avgY = 0.0;
-        double i = 0;
-        for (Point coordinate : coordinates) {
-            avgX += coordinate.x;
-            avgY += coordinate.y;
-            i++;
-        }
-        avgX /= i;
-        avgY /= i;
-        return new Point(avgX, avgY);
     }
 
     @NotNull

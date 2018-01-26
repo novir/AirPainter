@@ -1,6 +1,5 @@
 package air_painter;
 
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Mat;
@@ -8,9 +7,7 @@ import org.opencv.core.Point;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by Pawel Pluta on 06/01/18.
@@ -64,31 +61,30 @@ public class VideoController {
                                     TimeUnit unit) {
         threadExecutor = Executors.newSingleThreadScheduledExecutor();
         Runnable VideoCapture = () -> {
-            Image fxImage = getImageWithDrawing();
-            uiController.setImageToDisplay(fxImage);
+            try {
+                Mat frame = frameGrabber.getNextFrame();
+                Point newCoordinates = objectTracker.getCoordinates(frame);
+                Image image = getImageWithDrawing(frame, newCoordinates);
+                uiController.setImageToDisplay(image);
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+            }
         };
         threadExecutor.scheduleWithFixedDelay(VideoCapture, initialDelay,
                                                 delay, unit);
     }
 
-    private Image getImageWithDrawing() {
-        try {
-            Mat frame = frameGrabber.getNextFrame();
-            Point centroid = objectTracker.getObjectCoordinates(frame);
-            frame = drawOnFrame(frame, centroid);
-            return FrameConverter.convertToImage(frame);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return noCameraDisplay;
-        }
+    private Image getImageWithDrawing(@NotNull Mat frame, Point coordinates) {
+        Mat drawing = drawOnFrame(frame, coordinates);
+        return FrameConverter.convertToImage(drawing);
     }
 
     private Mat drawOnFrame(@NotNull Mat frame, @NotNull Point coordinates) {
-        Mat result = framePainter.drawCircle(frame, coordinates);
+        Mat result = framePainter.drawAllPoints(frame);
         if (requestedPictureDrawing) {
             framePainter.addNextPoint(coordinates);
         }
-        return framePainter.drawAllPoints(result);
+        return framePainter.drawCircle(result, coordinates);
     }
 
     public void stopDisplay() {
@@ -138,7 +134,7 @@ public class VideoController {
     }
 
     public void setMinObjectHeight(double height) {
-            objectTracker.setMinContourHeight(height);
+        objectTracker.setMinContourHeight(height);
     }
 
     public void startDrawing() {

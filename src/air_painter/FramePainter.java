@@ -6,25 +6,25 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by paul on 12/01/18.
  */
 public class FramePainter {
 
-    private Set<Point> drawingCoordinates = new HashSet<>();
+    private Map<Integer, Point> drawingCoordinates = new ConcurrentHashMap<>();
 
     public void addNextPoint(@NotNull Point coordinates) {
-        drawingCoordinates.add(coordinates);
+        drawingCoordinates.put(coordinates.hashCode(), coordinates.clone());
     }
 
     public Mat drawAllPoints(@NotNull Mat frame) {
         Mat result = frame.clone();
-        for (Point point : drawingCoordinates) {
-            Imgproc.circle(result, point, 3,
-                    new Scalar(0, 255, 0), 5);
+        for (Point point : drawingCoordinates.values()) {
+            Imgproc.circle(result, point, 10,
+                    new Scalar(0, 255, 0), 20);
         }
         return result;
     }
