@@ -102,15 +102,14 @@ public class ObjectTracker {
     @NotNull
     public Point getObjectCoordinates(@NotNull Mat source) {
         Mat blueObject = findBlueObject(source);
-        List<MatOfPoint> contours = findBigContours(blueObject);
-        return calculateAvgCentroid(contours);
+        MatOfPoint contour = findBiggestContour(blueObject);
+        return calculateCentroid(contour);
     }
 
     @NotNull
-    public List<MatOfPoint> findBigContours(@NotNull Mat trackedObject) {
+    public MatOfPoint findBiggestContour(@NotNull Mat trackedObject) {
         List<MatOfPoint> contours = findContours(trackedObject);
-        contours = removeSmallContours(contours);
-        return contours;
+        return removeSmallContours(contours);
     }
 
     @NotNull
@@ -122,29 +121,29 @@ public class ObjectTracker {
     }
 
     @NotNull
-    public List<MatOfPoint> removeSmallContours(@NotNull List<MatOfPoint> contours) {
-        List<MatOfPoint> bigContours = new ArrayList<>();
+    public MatOfPoint removeSmallContours(@NotNull List<MatOfPoint> contours) {
+        MatOfPoint bigContour = new MatOfPoint();
         for (MatOfPoint contour : contours) {
-            if (contour.height() > minContourHeight) {
-                bigContours.add(contour);
+            if (contour.height() > minContourHeight
+                    && contour.height() > bigContour.height()) {
+                bigContour = contour;
             }
         }
-        return bigContours;
+        return bigContour;
     }
 
     @NotNull
-    public Point calculateAvgCentroid(@NotNull List<MatOfPoint> contours) {
+    public Point calculateAvgCentroid(@NotNull List<Point> coordinates) {
         double avgX = 0.0;
         double avgY = 0.0;
-        double contoursCount = 0;
-        for (MatOfPoint contour : contours) {
-            Point centroid = calculateCentroid(contour);
-            avgX += centroid.x;
-            avgY += centroid.y;
-            contoursCount++;
+        double i = 0;
+        for (Point coordinate : coordinates) {
+            avgX += coordinate.x;
+            avgY += coordinate.y;
+            i++;
         }
-        avgX /= contoursCount;
-        avgY /= contoursCount;
+        avgX /= i;
+        avgY /= i;
         return new Point(avgX, avgY);
     }
 

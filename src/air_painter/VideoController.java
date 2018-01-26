@@ -1,5 +1,6 @@
 package air_painter;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.jetbrains.annotations.NotNull;
 import org.opencv.core.Mat;
@@ -52,39 +53,34 @@ public class VideoController {
                 frameGrabber.openCamera(cameraNumber);
             }
             requestedVideoOutput = true;
-            startDisplayThread(0, 1, TimeUnit.MILLISECONDS);
+            startDisplayThread(0, 10, TimeUnit.MILLISECONDS);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             uiController.setImageToDisplay(noCameraDisplay);
         }
     }
 
-    private void startDisplayThread(long initialDelay, long replyPeriod,
+    private void startDisplayThread(long initialDelay, long delay,
                                     TimeUnit unit) {
         threadExecutor = Executors.newSingleThreadScheduledExecutor();
-        Runnable videoCaptureInThread = () -> {
-            if (requestedVideoOutput) {
-                Image fxImage = getImageWithDrawing();
-                uiController.setImageToDisplay(fxImage);
-            }
+        Runnable VideoCapture = () -> {
+            Image fxImage = getImageWithDrawing();
+            uiController.setImageToDisplay(fxImage);
         };
-        threadExecutor.scheduleAtFixedRate(videoCaptureInThread, initialDelay,
-                                           replyPeriod, unit);
+        threadExecutor.scheduleWithFixedDelay(VideoCapture, initialDelay,
+                                                delay, unit);
     }
 
     private Image getImageWithDrawing() {
-        if (frameGrabber != null) {
-            try {
-                Mat frame = frameGrabber.getNextFrame();
-                Point centroid = objectTracker.getObjectCoordinates(frame);
-                frame = drawOnFrame(frame, centroid);
-                return FrameConverter.convertToImage(frame);
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
-                return noCameraDisplay;
-            }
+        try {
+            Mat frame = frameGrabber.getNextFrame();
+            Point centroid = objectTracker.getObjectCoordinates(frame);
+            frame = drawOnFrame(frame, centroid);
+            return FrameConverter.convertToImage(frame);
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
+            return noCameraDisplay;
         }
-        return noCameraDisplay;
     }
 
     private Mat drawOnFrame(@NotNull Mat frame, @NotNull Point coordinates) {
@@ -97,7 +93,7 @@ public class VideoController {
 
     public void stopDisplay() {
         if (requestedVideoOutput) {
-            stopDisplayThread(10, TimeUnit.MILLISECONDS);
+            stopDisplayThread(100, TimeUnit.MILLISECONDS);
             stopCamera();
             requestedVideoOutput = false;
         }

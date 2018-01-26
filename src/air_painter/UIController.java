@@ -1,5 +1,6 @@
 package air_painter;
 
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
@@ -29,7 +30,9 @@ public class UIController {
 
     public void setImageToDisplay(Image image) {
         if (image != null) {
-            imageDisplay.setImage(image);
+            Platform.runLater(() -> {
+                imageDisplay.setImage(image);
+            });
         }
     }
 
