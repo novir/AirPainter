@@ -50,7 +50,7 @@ public class VideoController {
                 frameGrabber.openCamera(cameraNumber);
             }
             requestedVideoOutput = true;
-            startDisplayThread(0, 10, TimeUnit.MILLISECONDS);
+            startDisplayThread(0, 1, TimeUnit.MILLISECONDS);
         } catch (IOException e) {
             System.err.println(e.getMessage());
             uiController.setImageToDisplay(noCameraDisplay);
